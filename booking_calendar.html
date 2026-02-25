@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="el"> <!--vasiki glwssa -->
+<head>
+    <meta charset="UTF-8"> <!--xaraktires UTF-8 gia ta ellinika grammata,symvola klp.  -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- kane platos ths selidas idio me to platos ths syskevis poy xrhsimopoihte h efarmogh me arxiko zoom 100% -->
+    <title>Κράτηση</title> <!--titlos browser-->
+    <link rel="stylesheet" href="booking_calendar.css"> <!-- css morfopoihsh selidas -->
+</head>
+
+<nav class="navbar">
+    <div class="nav-container">
+      <!--Logo that links to the mainpage-->
+        <div class="logo"><a href="pilates.html" class="logo">
+            <img src="IMG_1354.png" alt="Reforma Logo">
+            <div class="logo-text">
+                <h1>REFORMA FLOW</h1>    
+                <p>Pilates & Powerplate</p>
+            </div>
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="pilates.html">Αρχική</a></li>
+            <li><a href="#about">Σχετικά με Εμάς</a></li>
+            <li><a href="booking_calendar.html">Κράτηση</a></li>
+            <li><a href="#services">Υπηρεσίες</a></li>
+            <li><a href="#benefits">Οφέλη</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#contact">Επικοινωνία</a></li>
+        </ul>
+        
+       
+        <div class="nav-account">
+            <div class="account-dropdown">
+                <img src="image.png" alt="Account" class="account-icon">
+                <div class="dropdown-content">
+                <a href="login.html"  id="login-link">Σύνδεση</a>
+        <a href="signup.html" id="signup-link">Εγγραφή</a>
+        <a href="view_bookings.html" id="my-bookings-link" style="display:none;">Οι κρατήσεις μου</a>
+        <a href="#" id="delete-account-btn" style="display:none;">Διαγραφή Λογαργιασμού</a>
+        <a href="#" id="logout-btn" style="display:none;">Αποσύνδεση</a>
+        
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</nav>
+
+
+<body>
+    <div class="header">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;"> <!--stoixhsh sto kentro-->
+            <h1 id="Title">Book your spot</h1> <!--titlos selidas panw panw-->
+<!--id= monadiko onoma id gia na to vriskei h javascript-->
+         
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="calendar-header">
+            <!--koumpi poy kalei th javascript sinarthsh changeMonth(-1) kai phgainei ston proigoyumeno mina-->
+            <button onclick="changeMonth(-1)">‹</button>
+            <!-- grafei to mina pou einai sto hmerologio dinamika meso tou javascript function updateMonthInCalendar() - mesw tou identity -->
+            <h2 id="currentMonth"></h2>
+            <!--koumpi poy kalei th javascript sinarthsh changeMonth(1) kai phgainei ston epomeno mina-->
+            <button onclick="changeMonth(1)">›</button>
+        </div>
+
+        <div class="calendar">
+            <!-- dimioyrgite dinamika to olos o pinakas tou hmerologiou (headers + meres)  mesw ths sinartisis createCalendar() me JS-->
+        </div>
+
+        <p class="availability-title" id="availabilityTitle"></p>
+
+        <div class="sessions" id="sessions">
+            <!-- edw mpainei h lista me ta mathimata tis epilegmenis hmeras apo thn synartisi loadSessions() -->
+        </div>
+    </div>  
+         
+         <div id="popupID" class="popup" >
+            <div class="popup-content">
+                <div class="popup-title" id="popupTitle"></div>   <!-- titlos popup -->
+                <div class="popup-message" id="popupMessage"></div> <!-- keimeno / periexomeno popup -->
+                <div class="popup-buttons">
+                    <button id="popupSecondaryButton" class="popup-button-secondary">Back</button> <!-- deytero koumpi (cancel / back / close) -->
+                    <button id="popupPrimaryButton" class="popup-button-primary">OK</button>        <!-- kyrio koumpi (OK / login / confirm) -->
+                </div>
+    </div>
+</div>
+<script>
+   
+    // Pairnoume apo to localStorage to id tou xristi (an yparxei)
+    const userIdRaw   = localStorage.getItem('users_id');   
+
+    // Pairnoume apo to localStorage to username tou xristi (an yparxei)
+    const usernameRaw = localStorage.getItem('username');   
+
+    // Metatropi se boolean: an yparxei userIdRaw -> true, alliws false
+    const isLoggedIn  = !!userIdRaw;                        
+
+
+
+    // Vriskoume ola ta <a> pou exoun href pou xekinaei me "#"
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        // Gia kathe tetoio link vazoume event listener sto click
+        anchor.addEventListener('click', function (e) {
+            // Pairnoume ti timi tou href (opws #about px)
+            const targetSelector = this.getAttribute('href');
+
+            // An den exei katholou selector h einai aplos #, den kanoume tipota
+            if (!targetSelector || targetSelector === '#') return;
+
+            // Vriskoume to antistoixo stoixeio sto DOM p to id
+            const target = document.querySelector(targetSelector);
+
+            // An vrethei to target, tote kanoume smooth scroll pros ta ekei
+            if (target) {
+                e.preventDefault();
+
+                // Smooth scroll pros to target, sto panw meros tis selidas
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+
+  
+    // Vres to eikonidio tou logariasmou (profil ikonaki)
+    const accountIcon      = document.querySelector('.account-icon');
+    // To periexomeno tou dropdown (ta links mesa sto dropdown)
+    const dropdownContent  = document.querySelector('.dropdown-content');
+    // To wrapper stoixeio pou perilamvanei ikonidio + dropdown
+    const accountDropdown  = document.querySelector('.account-dropdown');
+
+    // Elegxoume oti exoume kai ta 3 stoixeia prin baloume event listeners
+    if (accountIcon && dropdownContent && accountDropdown) {
+        // Otan o xristis kanei click sto eikonidio tou logariasmou
+        accountIcon.addEventListener('click', (e) => {
+            // stopPropagation gia na mh "fygoun" ta events pros to document
+            // kai kleisei to dropdown amesos
+            e.stopPropagation();
+
+            //  toggle tis klasis "show" gia na emfanistei/kriftei to dropdown
+            dropdownContent.classList.toggle('show');
+        });
+
+        // Otan o xristis kanei click opoudipote sto document
+        document.addEventListener('click', (e) => {
+            // An to click DEN einai mesa sto accountDropdown (oute sto eikonidio oute sto dropdown)
+            if (!accountDropdown.contains(e.target)) {
+                // kryvoume to dropdown afairontas tin klasi "show"
+                dropdownContent.classList.remove('show');
+            }
+        });
+    }
+
+
+    
+    // Vrisoume ta antistoixa elements apo to DOM me ta ids tous
+    const loginLink        = document.getElementById('login-link');
+    const signupLink       = document.getElementById('signup-link');
+    const myBookingsLink   = document.getElementById('my-bookings-link');
+    const logoutBtn        = document.getElementById('logout-btn');
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+    // An o xristis einai sindedemenos (isLoggedIn = true)
+    if (isLoggedIn) {
+        // Kryvoume ta links gia login kai signup
+        if (loginLink)        loginLink.style.display        = 'none';
+        if (signupLink)       signupLink.style.display       = 'none';
+
+        // Emfanizoume to link "Oi kratisis mou"
+        if (myBookingsLink)   myBookingsLink.style.display   = 'block';
+
+        // Emfanizoume ta koumpia Logout kai Delete Account
+        if (logoutBtn)        logoutBtn.style.display        = 'block';
+        if (deleteAccountBtn) deleteAccountBtn.style.display = 'block';
+    } else {
+        // An DEN einai sindedemenos, deixnoume login / signup
+        if (loginLink)        loginLink.style.display        = '';
+        if (signupLink)       signupLink.style.display       = '';
+
+        // Kai kryvoume ta ypoloipa
+        if (myBookingsLink)   myBookingsLink.style.display   = 'none';
+        if (logoutBtn)        logoutBtn.style.display        = 'none';
+        if (deleteAccountBtn) deleteAccountBtn.style.display = 'none';
+    }
+
+
+    
+    // H synarthsh ayth svinei ta stoixeia syndesis apo to localStorage
+    // kai kanei redirect ton xristi pisw stin arxiki selida (pilates.html)
+    function clearAuthAndRedirect() {
+        // Diagrafoume to users_id pou krataei to id tou xristi
+        localStorage.removeItem('users_id');
+        // Diagrafoume to username
+        localStorage.removeItem('username');
+        // Diagrafoume to isLoggedIn (an yparxei)
+        localStorage.removeItem('isLoggedIn'); 
+
+        // Kanoume redirect ton xristi stin arxiki selida
+        window.location.href = 'pilates.html';
+    }
+
+
+
+    // Xrisimopoioume optional chaining giati mporei to logoutBtn na einai null
+    logoutBtn?.addEventListener('click', (e) => {
+        // Akyrwnoume to default behavior tou <a> (na min allaksei selida apla)
+        e.preventDefault();
+
+        // An gia kapoio logo den eimaste sindedemenoi, apla katharizoume auth kai kanoume redirect
+        if (!isLoggedIn) {
+            clearAuthAndRedirect();
+            return;
+        }
+
+        // Stelname POST request sto logout.php gia na ginei logout kai sto server-side
+        fetch('logout.php', {
+            method: 'POST',  // method POST gia apostoli dedomenwn
+            headers: {
+                // Dilwnoume oti steloume dedomena san form data
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            // To body tou POST: stelnoume to users_id
+            body: new URLSearchParams({
+                users_id: userIdRaw
+            })
+        })
+        // Perimenoume tin apantisi apo ton server kai ti metatrepoume se JSON
+        .then(response => response.json())
+        .then(result => {
+            // An o server success sto status
+            if (result.status === 'success') {
+                // Katharizoume localStorage kai kanoume redirect stin pilates.html
+                clearAuthAndRedirect();
+            } else {
+                // Alliws deixnoume minima sfalmatos
+                alert('Logout error. Please try again.');
+            }
+        })
+      
+        .catch(err => {
+            // Deixnoume minima sfalmatos ston xristi
+            alert('Logout error. Please try again.');
+        });
+    });
+
+
+    // Optional chaining ksana an yparxei to koumpi prosthetoume listener
+    deleteAccountBtn?.addEventListener('click', (e) => {
+        // Akyrwnoume to default behavior tou link
+        e.preventDefault();
+
+        // An den yparxei username sto localStorage, den mporoume na diagrafsoume logariasmo
+        if (!usernameRaw) {
+            alert('No username found. Please log in again.');
+            clearAuthAndRedirect();
+            return;
+        }
+
+        // Prompt epivevaiwsis apo ton xristi oti thelei ontws na diagrafei ton logariasmo
+        const confirmDelete = confirm('Είσαι σίγουρος/η ότι θέλεις να διαγράψεις τον λογαριασμό;');
+        // An o xristis patise Cancel
+        if (!confirmDelete) return;
+
+        // Stelname POST request sto delete_account.php gia diagrafi logariasmou sto server
+        fetch('delete_account.php', {
+            method: 'POST', // method POST
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            // Stelnoume sto server to username pou tha diagrafei
+            body: new URLSearchParams({
+                username: usernameRaw
+            })
+        })
+        // Metatrepoume tin apantisi apo ton server se JSON
+        .then(response => response.json())
+        .then(result => {
+            // An o server gyrise status = "success"
+            if (result.status === 'success') {
+                // Emfanizoume minima oti o logariasmos diagrafike
+                alert('Ο λογαριασμός σου διαγράφηκε.');
+                // Katharizoume ta dedomena kai kanoume redirect
+                clearAuthAndRedirect();
+            } else {
+                alert('Σφάλμα στη διαγραφή λογαριασμού. Προσπάθησε ξανά.');
+            }
+        })
+      //catch gia errors
+        .catch(err => {
+            alert('Σφάλμα στη διαγραφή λογαριασμού. Προσπάθησε ξανά.');
+        });
+    });
+</script>
+
+      
+ 
+    <script src="booking_calendar.js"></script>
+    
+</body>
+</html>

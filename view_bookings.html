@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Οι Κρατήσεις μου</title>
+    <link rel="stylesheet" href="view_bookings.css">
+</head>
+
+<body>
+   <!-- Sticky Navigation -->
+   <nav class="navbar">
+    <div class="nav-container">
+        <!--Logo that links to the mainpage-->
+        <div class="logo"><a href="pilates.html" class="logo">
+            <img src="IMG_1354.png" alt="Reforma Logo">
+            <div class="logo-text">
+                <h1>REFORMA FLOW</h1>    
+                <p>Pilates & Powerplate</p>
+            </div>
+            </a>
+        </div>
+            
+            <ul class="nav-links">
+                <li><a href="pilates.html">Αρχική</a></li>
+                <li><a href="#about">Σχετικά με Εμάς</a></li>
+                <li><a href="booking_calendar.html">Κράτηση</a></li>
+                <li><a href="#services">Υπηρεσίες</a></li>
+                <li><a href="#benefits">Οφέλη</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Επικοινωνία</a></li>
+            </ul>
+            
+            <div class="nav-account">
+                <div class="account-dropdown">
+                    <img src="image.png" alt="Account" class="account-icon">
+                    <div class="dropdown-content">
+                      <a href="login.html"  id="login-link">Σύνδεση</a>
+                      <a href="signup.html" id="signup-link">Εγγραφή</a>
+                      <a href="view_bookings.html" id="my-bookings-link" style="display:none;">Οι κρατήσεις μου</a>
+                      <a href="#" id="delete-account-btn" style="display:none;">Διαγραφή Λογαργιασμού</a>
+                      <a href="#" id="logout-btn" style="display:none;">Αποσύνδεση</a>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1 id="Title">Οι Κρατήσεις μου</h1>
+    </div>
+    
+
+    <div class="date-navigation">
+        <button class="nav-btn" onclick="changeDay(-1)">‹</button>
+        <h2 id="dateHeader"></h2>
+        <button class="nav-btn" onclick="changeDay(1)">›</button>
+    </div>
+
+    <div class="booking-list" id="bookingList">
+        <div class="loading"></div>
+    </div>
+
+    <script src="view_bookings.js"></script>
+
+
+    <script>
+
+        const userId   = localStorage.getItem('users_id');
+        const username = localStorage.getItem('username');
+
+        const accountIcon      = document.querySelector('.account-icon');
+        const dropdownContent  = document.querySelector('.dropdown-content');
+        const accountDropdown  = document.querySelector('.account-dropdown');
+
+        if (accountIcon && dropdownContent && accountDropdown) {
+            // Toggle dropdown on icon click
+            accountIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownContent.classList.toggle('show');
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!accountDropdown.contains(e.target)) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+        }
+
+        // -------- AUTH DROPDOWN LOGIC (login / logout / my bookings / delete account) --------
+
+        const isLoggedIn = !!userId;
+
+        const loginLink        = document.getElementById('login-link');
+        const signupLink       = document.getElementById('signup-link');
+        const myBookingsLink   = document.getElementById('my-bookings-link');
+        const logoutBtn        = document.getElementById('logout-btn');
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+        // Show / hide dropdown options based on login status
+        if (isLoggedIn) {
+            if (loginLink)        loginLink.style.display        = 'none';
+            if (signupLink)       signupLink.style.display       = 'none';
+            if (myBookingsLink)   myBookingsLink.style.display   = 'block';
+            if (logoutBtn)        logoutBtn.style.display        = 'block';
+            if (deleteAccountBtn) deleteAccountBtn.style.display = 'block';
+        } else {
+            if (loginLink)        loginLink.style.display        = 'block';
+            if (signupLink)       signupLink.style.display       = 'block';
+            if (myBookingsLink)   myBookingsLink.style.display   = 'none';
+            if (logoutBtn)        logoutBtn.style.display        = 'none';
+            if (deleteAccountBtn) deleteAccountBtn.style.display = 'none';
+        }
+
+        // Helper: clear local auth data and redirect home
+        function clearAuthAndRedirect() {
+            localStorage.removeItem('users_id');
+            localStorage.removeItem('username');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'pilates.html'; // or pilates.html if that's your file
+        }
+
+        // Logout handler (uses your logout.php)
+        logoutBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            if (!userId) {
+                clearAuthAndRedirect();
+                return;
+            }
+
+            fetch('logout.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    users_id: userId
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Logout result:', result);
+                if (result.status === 'success') {
+                    clearAuthAndRedirect();
+                } else {
+                    alert('Logout error. Please try again.');
+                }
+            })
+            .catch(err => {
+                console.error('Logout error:', err);
+                alert('Logout error. Please try again.');
+            });
+        });
+
+        // Delete account handler (uses your deleteAccount.php)
+        deleteAccountBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const confirmDelete = confirm('Are you sure you want to delete your account? This action cannot be undone.');
+            if (!confirmDelete) return;
+
+            fetch('delete_account.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    username: username
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Delete account result:', result);
+                if (result.status === 'success') {
+                    alert('Your account has been deleted.');
+                    clearAuthAndRedirect();
+                } else {
+                    alert('Delete account error. Please try again.');
+                }
+            })
+            .catch(err => {
+                console.error('Delete account error:', err);
+                alert('Delete account error. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --white: #FFFFFF;
+    --soft-gray: #F3F3F3;
+    --nude: #EADDD2;
+    --rose-gold: #E7BFBF;
+    --sage-green: #A8B5A0;
+    --dark-gray: #4A5759;
+    --text-dark: #2C3333;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: linear-gradient(135deg, var(--sage-green) 0%, var(--nude) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+/* Navigation */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.logo-text h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+}
+
+.logo-text p {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--sage-green);
+    font-weight: 300;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 35px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 400;
+    font-size: 15px;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.nav-links a:hover {
+    color: var(--sage-green);
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--sage-green);
+    transition: width 0.3s;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.nav-account {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.account-dropdown {
+    position: relative;
+}
+
+.account-icon {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    background: var(--sage-green);
+    border-radius: 50%;
+    padding: 6px;
+    transition: transform 0.3s;
+}
+
+.account-icon:hover {
+    transform: scale(1.1);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: white;
+    min-width: 160px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1001;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: background 0.3s;
+}
+
+.dropdown-content a:hover {
+    background: var(--soft-gray);
+}
+
+.lang-switch {
+    background: transparent;
+    border: 2px solid var(--sage-green);
+    color: var(--sage-green);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.lang-switch:hover {
+    background: var(--sage-green);
+    color: white;
+}
+
+#signup-form {
+    background: white;
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    max-width: 450px;
+    width: 100%;
+    margin: 20px;
+}
+
+#signup-form h2 {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--text-dark);
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+ input[type="text"],
+ input[type="password"],
+input[type="email"], input[type="date"]{
+    width: 100%;
+    padding: 15px;
+    padding-right: 60px;
+    border: 2px solid var(--soft-gray);
+    border-radius: 10px;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--sage-green);
+    box-shadow: 0 0 0 3px rgba(168, 181, 160, 0.1);
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sage-green);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+    transition: color 0.3s;
+}
+
+.toggle-eye:hover {
+    color: var(--dark-gray);
+}
+
+.forgpass {
+    display: block;
+    text-align: right;
+    font-size: 14px;
+    color: var(--sage-green);
+    text-decoration: none;
+    margin-bottom: 25px;
+    transition: color 0.3s;
+}
+
+.forgpass:hover {
+    color: var(--dark-gray);
+}
+
+input[type="submit"] {
+    width: 100%;
+    background: var(--sage-green);
+    color: white;
+    border: none;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+input[type="submit"]:hover {
+    background: var(--dark-gray);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(168, 181, 160, 0.3);
+}
+
+#signup-form p {
+    text-align: center;
+    color: var(--dark-gray);
+    font-size: 15px;
+}
+
+#signup-form p a.su {
+    color: var(--sage-green);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+#signup-form p a.su:hover {
+    color: var(--dark-gray);
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    
+    #signup-form {
+        padding: 40px 30px;
+        margin: 20px 15px;
+    }
+    
+    #signup-form h2 {
+        font-size: 28px;
+    }
+}

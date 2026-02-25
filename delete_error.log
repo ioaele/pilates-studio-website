@@ -1,0 +1,10 @@
+[01-Dec-2025 22:30:04 UTC] PHP Warning:  require(connect.php): Failed to open stream: No such file or directory in /Applications/XAMPP/xamppfiles/htdocs/26/delete_booking.php on line 18
+[01-Dec-2025 22:30:04 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'connect.php' (include_path='.:/opt/homebrew/Cellar/php@8.1/8.1.33_1/share/php@8.1/pear') in /Applications/XAMPP/xamppfiles/htdocs/26/delete_booking.php:18
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/26/delete_booking.php on line 18
+[01-Dec-2025 22:33:44 UTC] PHP Warning:  Undefined variable $pdo in /Applications/XAMPP/xamppfiles/htdocs/26/delete_booking.php on line 27
+[01-Dec-2025 22:33:44 UTC] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /Applications/XAMPP/xamppfiles/htdocs/26/delete_booking.php:27
+Stack trace:
+#0 {main}
+  thrown in /Applications/XAMPP/xamppfiles/htdocs/26/delete_booking.php on line 27

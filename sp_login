@@ -1,0 +1,22 @@
+use forma4
+
+IF OBJECT_ID ('sp_login', 'P') IS NOT NULL
+    DROP PROCEDURE sp_login;
+GO
+CREATE PROCEDURE sp_login(
+@username varchar(50),
+@browser varchar(100),
+@ip varchar(45)
+)as
+SET NOCOUNT ON
+begin 
+if ( not exists (select * from USER_SIGNUPS where username = @username))
+begin
+raiserror('no such username exists',-1,-1);
+end
+insert into LOGIN([login_time],[browser],[ip_address],[users_id])
+select
+GETDATE(),@browser,@ip,t.[users_id] 
+from USER_SIGNUPS t where t.[username] = @username
+end
+go

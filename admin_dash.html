@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- settings gia mobile responsive kai titlo -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Weekly Session Management</title>
+
+    <!-- External CSS tou admin dashboard -->
+    <link rel="stylesheet" href="admin_dash.css">
+</head>
+<body>
+
+    <!-- Header me titlo, navigation koumpia kai extra actions -->
+    <div class="header">
+        <h1> Weekly Session Management</h1>
+
+        <!-- Navigation gia allagi evdomadas (piso-empros) -->
+        <div class="week-navigation">
+            <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+            <div class="week-label" id="weekLabel"></div>
+            <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+        </div>
+
+        <!-- Koumpia pano deksia: lista pelatwn + generate sessions -->
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="openClientsModal()"> All Clients</button>
+            <button class="btn btn-success" onclick="openGenerateModal()"> Generate Standard Sessions</button>
+        </div>
+    </div>
+
+    <!-- Basiko container me to calendar -->
+    <div class="container">
+        <div class="calendar-section">
+            <div id="alert"></div>
+
+            <!-- To calendar tha gemizei me JS, auto einai to placeholder -->
+            <div id="weeklyCalendar"></div>
+        </div>
+    </div>
+
+    <!-- Modal gia epiloges session (edit, booked clients) -->
+    <div id="sessionActionModal" class="modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+
+            <div class="modal-header">
+                <h3>Session Options</h3>
+                <button class="close-btn" onclick="closeSessionActionModal()">&times;</button>
+            </div>
+
+            <!-- Plhrofories tou epilegmenou session -->
+            <div class="session-info-box" id="actionModalSessionInfo"></div>
+
+            <!-- Koumpia gia actions tou session -->
+            <div class="action-buttons">
+                <button class="action-btn action-btn-edit" onclick="editSessionFromAction()"> Edit Session</button>
+                <button class="action-btn action-btn-clients" onclick="viewSessionClients()"> View Booked Clients</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal gia tous pelates pou exoun booking sto session -->
+    <div  id="sessionClientsModal" class="modal session-clients-modal">
+        <div  class="modal-content-sess" onclick="event.stopPropagation()">
+
+            <div class="modal-header">
+                <h3>Booked Clients</h3>
+                <button class="close-btn" onclick="closeSessionClientsModal()">&times;</button>
+            </div>
+
+            <div id="sessionClientsAlert"></div>
+
+            <!-- Info tou session mesa sto clients modal -->
+            <div class="session-info-box" id="sessionClientsInfo"></div>
+
+            <!-- Pinakas me tous clients tou session -->
+            <div class="clients-table-wrapper">
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Booking Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionClientsTableBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal gia prosthiki i edit session -->
+    <div id="sessionModal" class="modal">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Session</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div id="modalAlert"></div>
+
+            <!-- Forma opu diexeirizetai to session -->
+            <form id="sessionForm" onsubmit="saveSession(event)">
+                
+                <!-- Krimena fields gia id, imera kai ora -->
+                <input type="hidden" id="sessionId">
+                <input type="hidden" id="sessionDate">
+                <input type="hidden" id="sessionTimeStart">
+
+                <!-- Display imeras kai oras -->
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="text" id="displayDateTime" readonly style="background: #f8f9fa;">
+                </div>
+
+                <!-- Epilogi epipedou -->
+                <div class="form-group">
+                    <label for="level">Level *</label>
+                    <select id="level" required>
+                        <option value="">Select Level</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Pro">Pro</option>
+                    </select>
+                </div>
+
+                <!-- Diarkeia tou session -->
+                <div class="form-group">
+                    <label for="duration">Duration *</label>
+                    <select id="duration" required onchange="updateEndTime()">
+                        <option value="45" selected>45 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="90">1.5 hours</option>
+                        <option value="120">2 hours</option>
+                    </select>
+                </div>
+
+                <!-- Cap -->
+                <div class="form-group">
+                    <label for="capacity">Capacity *</label>
+                    <input type="number" id="capacity" min="1" max="50" value="3" required oninput="syncTypeWithCapacity()">
+                </div>
+
+                <!-- Status tou session -->
+                <div class="form-group">
+                    <label for="status">Status *</label>
+                    <select id="status" required>
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Koumpia Save, Delete, Cancel -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">Save Session</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteCurrentSession()" id="deleteBtn" style="display:none;">Delete</button>
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Modal gia generate weekly sessions -->
+    <div id="generateModal" class="modal">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3>Generate Standard Sessions</h3>
+                <button class="close-btn" onclick="closeGenerateModal()">&times;</button>
+            </div>
+
+            <div id="generateAlert"></div>
+
+            <!-- Mikro info keimeno -->
+            <p style="margin-bottom: 20px; color: #666;">
+                This will create standard sessions for the current week based on your template.
+            </p>
+
+            <!-- Forma gia generate weekly sessions -->
+            <form id="generateForm" onsubmit="generateStandardSessions(event)">
+
+                <!-- Epilogi imerwn -->
+                <div class="form-group">
+                    <label>Select Days to Generate:</label>
+
+                    <!-- List me imeres pou mporoume na epilexoume -->
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                        <label><input type="checkbox" name="days" value="1" checked> Monday</label>
+                        <label><input type="checkbox" name="days" value="2" checked> Tuesday</label>
+                        <label><input type="checkbox" name="days" value="3" checked> Wednesday</label>
+                        <label><input type="checkbox" name="days" value="4" checked> Thursday</label>
+                        <label><input type="checkbox" name="days" value="5" checked> Friday</label>
+                        <label><input type="checkbox" name="days" value="6"> Saturday</label>
+                        <label><input type="checkbox" name="days" value="0"> Sunday</label>
+                    </div>
+                </div>
+
+                <!-- Ora enarksis -->
+                <div class="form-group">
+                    <label for="genStartTime">Start Time *</label>
+                    <select id="genStartTime" required>
+                        <option value="07:00" selected>07:00 AM</option>
+                        <option value="08:00">08:00 AM</option>
+                        <option value="09:00">09:00 AM</option>
+                    </select>
+                </div>
+
+                <!-- Ora lixis -->
+                <div class="form-group">
+                    <label for="genEndTime">End Time *</label>
+                    <select id="genEndTime" required>
+                        <option value="17:00">05:00 PM</option>
+                        <option value="18:00">06:00 PM</option>
+                        <option value="19:00">07:00 PM</option>
+                        <option value="20:00">08:00 PM</option>
+                        <option value="21:00" selected>09:00 PM</option>
+                    </select>
+                </div>
+
+                <!-- Default level pou tha exoun ta generated sessions -->
+                <div class="form-group">
+                    <label for="genLevel">Default Level *</label>
+                    <select id="genLevel" required>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate" selected>Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                        <option value="Pro">Pro</option>
+                    </select>
+                </div>
+
+                <!-- Diarkeia gia ola ta sessions -->
+                <div class="form-group">
+                    <label for="genDuration">Session Duration *</label>
+                    <select id="genDuration" required>
+                        <option value="45" selected>45 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="90">1.5 hours</option>
+                        <option value="120">2 hours</option>
+                    </select>
+                </div>
+
+                <!-- Capacity twn generated -->
+                <div class="form-group">
+                    <label for="genCapacity">Capacity *</label>
+                    <input type="number" id="genCapacity" value="10" min="1" max="50" required>
+                </div>
+
+                <!-- Proeidopoiisi oti tha skiparei occupied slots -->
+                <div class="alert alert-warning">
+                    ⚠️ This will skip time slots that already have sessions.
+                </div>
+
+                <!-- Koumpia Generate & Cancel -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-success">Generate Sessions</button>
+                    <button type="button" class="btn" onclick="closeGenerateModal()">Cancel</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Modal me olous tous clients -->
+    <div id="clientsModal" class="modal clients-modal">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3>All Clients</h3>
+                <button class="close-btn" onclick="closeClientsModal()">&times;</button>
+            </div>
+
+            <div id="clientsAlert"></div>
+
+            <!-- Pinakas me olous tous clients -->
+            <div class="clients-table-wrapper">
+                <table class="clients-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Time Created</th>
+                            <th>Phone</th>
+                            <th>Date of Birth</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- External JavaScript sou -->
+    <script src="admin_dash.js"></script>
+
+</body>
+</html>

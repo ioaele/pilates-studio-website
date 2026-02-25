@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log-in</title>
+  <link rel="stylesheet" href="login-style.css">
+  </head>
+
+  <body>
+   <!-- Sticky Navigation -->
+   <nav class="navbar">
+    <div class="nav-container">
+        <!--Logo that links to the mainpage-->
+        <div class="logo"><a href="pilates.html" class="logo">
+            <img src="IMG_1354.png" alt="Reforma Logo">
+            <div class="logo-text">
+                <h1>REFORMA FLOW</h1>    
+                <p>Pilates & Powerplate</p>
+            </div>
+            </a>
+        </div>
+            
+            <ul class="nav-links">
+                <li><a href="pilates.html">Αρχική</a></li>
+                <li><a href="#about">Σχετικά με Εμάς</a></li>
+                <li><a href="booking_calendar.html">Κράτηση</a></li>
+                <li><a href="#services">Υπηρεσίες</a></li>
+                <li><a href="#benefits">Οφέλη</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Επικοινωνία</a></li>
+            </ul>
+            
+            <div class="nav-account">
+                <div class="account-dropdown">
+                    <img src="image.png" alt="Account" class="account-icon">
+                    <div class="dropdown-content">
+                      <a href="login.html"  id="login-link">Σύνδεση</a>
+                      <a href="signup.html" id="signup-link">Εγγραφή</a>
+                      <a href="view_bookings.html" id="my-bookings-link" style="display:none;">Οι κρατήσεις μου</a>
+                      <a href="#" id="delete-account-btn" style="display:none;">Διαγραφή Λογαργιασμού</a>
+                      <a href="#" id="logout-btn" style="display:none;">Αποσύνδεση</a>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+     
+    <!-- login form-->
+    <form id="login-form" action="pilates.html" method="post">
+      <h2>Login</h2>
+      <div class="input-wrapper">
+      <input type="text" id="username" name="username" placeholder="Username" required>
+      </div>  
+      
+      <div class="input-wrapper">
+      <input type="password" id="password" name="password" placeholder="Password" required>
+       <span class="toggle-eye" onclick="togglePassword('password', this)">Show</span>
+      </div>
+
+      <a class="forgpass" href="changePassword.html">Forgot password?</a>
+     
+      <input type="submit" value="Login">
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          console.log('--- LOGIN PAGE LOADED ---');
+        
+          /* ---------- Show / Hide Password ---------- */
+          window.togglePassword = function(fieldId, toggleElement) {
+            const field = document.getElementById(fieldId);
+            if (!field) return;
+            if (field.type === "password") {
+              field.type = "text";
+              toggleElement.textContent = "Hide";
+            } else {
+              field.type = "password";
+              toggleElement.textContent = "Show";
+            }
+          };
+        
+          /* ---------- Account Dropdown ---------- */
+          const accountIcon     = document.querySelector('.account-icon');
+          const dropdownContent = document.querySelector('.dropdown-content');
+          const accountDropdown = document.querySelector('.account-dropdown');
+        
+          if (accountIcon && dropdownContent && accountDropdown) {
+            accountIcon.addEventListener('click', (e) => {
+              e.stopPropagation();
+              dropdownContent.classList.toggle('show');
+            });
+        
+            document.addEventListener('click', (e) => {
+              if (!accountDropdown.contains(e.target)) {
+                dropdownContent.classList.remove('show');
+              }
+            });
+          }
+        
+          /* ---------- AUTH DROPDOWN (navbar) ---------- */
+          const userId   = localStorage.getItem('users_id');
+          const username = localStorage.getItem('username');
+          const isLoggedIn = !!userId;
+        
+          const loginLink        = document.getElementById('login-link');
+          const signupLink       = document.getElementById('signup-link');
+          const myBookingsLink   = document.getElementById('my-bookings-link');
+          const logoutBtn        = document.getElementById('logout-btn');
+          const deleteAccountBtn = document.getElementById('delete-account-btn');
+        
+          if (isLoggedIn) {
+            console.log('Navbar: user is LOGGED IN');
+            if (loginLink)        loginLink.style.display        = 'none';
+            if (signupLink)       signupLink.style.display       = 'none';
+            if (myBookingsLink)   myBookingsLink.style.display   = 'block';
+            if (logoutBtn)        logoutBtn.style.display        = 'block';
+            if (deleteAccountBtn) deleteAccountBtn.style.display = 'block';
+          } else {
+            console.log('Navbar: user is LOGGED OUT');
+            if (loginLink)        loginLink.style.display        = '';
+            if (signupLink)       signupLink.style.display       = '';
+            if (myBookingsLink)   myBookingsLink.style.display   = 'none';
+            if (logoutBtn)        logoutBtn.style.display        = 'none';
+            if (deleteAccountBtn) deleteAccountBtn.style.display = 'none';
+          }
+        
+          function clearAuthAndRedirect() {
+            localStorage.removeItem('users_id');
+            localStorage.removeItem('username');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'pilates.html';
+          }
+        
+          // Logout
+          logoutBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+        
+            if (!userId) {
+              clearAuthAndRedirect();
+              return;
+            }
+        
+            fetch('logout.php', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+              body: new URLSearchParams({ users_id: userId })
+            })
+            .then(r => r.json())
+            .then(result => {
+              console.log('Logout result:', result);
+              if (result.status === 'success') {
+                clearAuthAndRedirect();
+              } else {
+                alert('Σφάλμα στο logout. Προσπάθησε ξανά.');
+              }
+            })
+            .catch(err => {
+              console.error('Logout error:', err);
+              alert('Σφάλμα στο logout. Προσπάθησε ξανά.');
+            });
+          });
+        
+          // Delete account
+          deleteAccountBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+        
+            if (!username) {
+              alert('Δεν βρέθηκε username. Κάνε ξανά login.');
+              clearAuthAndRedirect();
+              return;
+            }
+        
+            if (!confirm('Είσαι σίγουρος/η ότι θέλεις να διαγράψεις τον λογαριασμό;')) return;
+        
+            fetch('deleteAccount.php', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+              body: new URLSearchParams({ username: username })
+            })
+            .then(r => r.json())
+            .then(result => {
+              console.log('Delete account result:', result);
+              if (result.status === 'success') {
+                alert('Ο λογαριασμός σου διαγράφηκε.');
+                clearAuthAndRedirect();
+              } else {
+                alert('Σφάλμα στη διαγραφή λογαριασμού.');
+              }
+            })
+            .catch(err => {
+              console.error('Delete account error:', err);
+              alert('Σφάλμα στη διαγραφή λογαριασμού.');
+            });
+          });
+        
+         
+          const form = document.getElementById('login-form');
+          if (!form) {
+            console.error('Login form not found!');
+            return;
+          }
+        
+          form.addEventListener('submit', (e) => {
+            e.preventDefault();
+        
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+        
+            const usernameVal = usernameInput.value.trim();
+            const passwordVal = passwordInput.value;
+        
+            if (!usernameVal || !passwordVal) {
+              alert('Συμπλήρωσε username και password.');
+              return;
+            }
+        
+            fetch('login1.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                username: usernameVal,
+                password: passwordVal
+              })
+            })
+            .then(response => response.json())
+            .then(result => {
+              console.log('Login result:', result);
+        
+              if (result.status === 'success') {
+
+        localStorage.setItem('users_id', result.userid);
+localStorage.setItem('username', usernameVal);
+localStorage.setItem('isLoggedIn', 'true');
+
+// check admin
+if (usernameVal === "tsiol00") {
+  alert('Welcome Admin!');
+  window.location.href = 'admin_dash.html';
+  return; 
+}
+
+alert(result.message || 'Σύνδεση επιτυχής!');
+window.location.href = 'pilates.html';
+}
+
+              else if (result.status === 'ERROR') {
+                alert(result.message || 'Λάθος στοιχεία (username).');
+              } 
+              else if (result.status === 'error2') {
+                // σφάλμα από try/catch
+                alert(result.message || 'Σφάλμα στο login. Προσπάθησε ξανά.');
+              } 
+              else {
+                alert('Λάθος username ή password.');
+              }
+            })
+            .catch(error => {
+              console.error('Login fetch error:', error);
+              alert('Σφάλμα σύνδεσης. Προσπάθησε ξανά.');
+            });
+          });
+        });
+        </script>
+        
+        
+        
+       <p>Don't have an account? <a class="su" href="signup.html">Sign up</a></p>
+       </form>
+    </body>
+
+    
+</html>
